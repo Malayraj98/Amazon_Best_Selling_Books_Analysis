@@ -1,0 +1,232 @@
+---
+title: "Amazon_best_selling_books_RMD"
+author: "Malay Raj"
+date: "2023-05-30"
+output:
+  word_document: default
+  html_document: default
+---
+
+## AMAZON BEST SELLING BOOKS FROM 2009 TO 2019 ANALYSIS:
+
+Amazon Top 50 Best Selling Books (made available by Souter Saalu under a CC0 license): Data about Amazon's bestselling
+books from 2009 to 2019, categorized into fiction and nonfiction.
+
+## Loading Required Packages.
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(plyr)
+library(skimr)
+```
+
+
+## Displaying my current working directory.
+
+```{r}
+getwd()
+```
+
+
+## Collecting the data.
+
+```{r}
+Books = read.csv("C:/Amazon top 50 best selling books analysis/bestsellers with categories.csv")
+```
+
+
+## Displaying the first six rows of the dataset.
+
+```{r}
+head(Books)
+```
+
+
+## Checking the number of rows and dimension of the dataset.
+
+```{r}
+nrow(Books)
+
+dim(Books)
+```
+
+
+## Renaming the column User.Rating to Ratings.
+
+```{r}
+Books=plyr::rename(Books, replace=c( "User.Rating" = "Ratings"))
+```
+
+
+## Viewing the new column names.
+
+```{r}
+colnames(Books)
+```
+
+
+## Inspecting the dataframe and look for inconguencies.
+
+```{r}
+str(Books)
+```
+
+
+## Checking for null values in our dataset.
+
+```{r}
+sum(is.null(Books))
+```
+
+
+## Checking for any duplicate values in our dataset.
+
+```{r}
+anyDuplicated(Books)
+```
+
+
+## Seeing how many observations fall under each of these columns.
+
+```{r}
+table(Books$Genre)
+table(Books$Year)
+table(Books$Ratings)
+```
+
+
+## CONDUCTNG DESCRIPTIVE ANALYSIS:
+
+Descriptive analysis on few columns.
+
+```{r}
+summary(Books$Ratings)
+```
+
+
+```{r}
+summary(Books$Reviews)
+```
+
+
+```{r}
+summary(Books$Price)
+```
+
+
+Comparing Ratings, Reviews, Price with different Genre.
+
+```{r}
+aggregate(Books$Ratings ~ Books$Genre, FUN = mean)
+aggregate(Books$Ratings ~ Books$Genre, FUN = median)
+aggregate(Books$Ratings ~ Books$Genre, FUN = max)
+aggregate(Books$Ratings ~ Books$Genre, FUN = min)
+```
+
+
+```{r}
+aggregate(Books$Price ~ Books$Genre, FUN = mean)
+aggregate(Books$Price ~ Books$Genre, FUN = median)
+aggregate(Books$Price ~ Books$Genre, FUN = max)
+aggregate(Books$Price ~ Books$Genre, FUN = min)
+```
+
+
+```{r}
+aggregate(Books$Reviews ~ Books$Genre, FUN = mean)
+aggregate(Books$Reviews ~ Books$Genre, FUN = median)
+aggregate(Books$Reviews ~ Books$Genre, FUN = max)
+aggregate(Books$Reviews ~ Books$Genre, FUN = min)
+```
+
+
+## SUMMARY STATISTICS.
+
+```{r}
+skimr::skim_without_charts(Books)
+```
+
+
+## DATA VISUALIZATION:
+
+Comparing each genre price values.
+
+```{r}
+ggplot(Books) + 
+  geom_col(mapping = aes(x=Genre, y=Price, fill=Genre)) + 
+  labs(title="Each Genre Price")
+```
+
+
+Comparing each genre price distribution.
+
+```{r}
+ggplot(Books, aes(x="", y=Price, fill=Genre)) +
+  ggtitle("Each Genre Price Percentage") +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y", start=0) +
+  theme_void() 
+```
+
+
+Checking the number of ratings per year.
+
+```{r}
+ggplot(Books) + 
+  geom_col(mapping = aes(x=Year, y=Ratings)) +
+  labs(title="No of ratings per year")
+```
+
+
+Comparing the rating per genre.
+
+```{r}
+ggplot(Books) + 
+  geom_col(mapping = aes(x=Genre, y=Ratings)) +
+  labs(title="Ratings per genre")
+```
+
+
+Checking number of books sold per genre over 10 years.
+
+```{r}
+ggplot(Books, aes(x="", y=Year, fill=Genre)) +
+  ggtitle("Books sold per genre over the year") +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y", start=0) +
+  theme_void() 
+```
+
+
+Checking the number of reviews got per year.
+
+```{r}
+ggplot(Books) + 
+  geom_col(mapping = aes(x=Year, y=Reviews)) +
+  labs(title="Reviews per year")
+```
+
+
+Checking the top 5 books over the 10 years period reviews vise.
+
+```{r}
+Books %>%
+  arrange(-Reviews) %>%
+  slice_head(n=10) %>%
+  ggplot(aes(reorder(Name, Reviews), Reviews)) +
+  geom_point(colour = "blue", size = 3) +
+  theme(text=element_text(size=10)) + 
+  coord_flip() +
+  labs(title = "Top 5 best selling books Review vise", x = "")
+```
+
+
+
+
+
+
+
+
+
